@@ -11,11 +11,13 @@ class GraphBuilder {
     private static Node _build(String exp) throws InvalidInputException {
         int topOperatorIdx = indexOfTopLevelOperator(exp);
         if(topOperatorIdx == -1) {
+            String cleanedExp = removeOuterParens(exp);
+
             // If the expression has no operators and is only one character, it must be a variable
-            if(exp.length() == 1 && isVariableChar(exp.charAt(0))) {
-                return new NAMED_INPUT_PIPE(exp);
+            if(cleanedExp.length() == 1 && isVariableChar(cleanedExp.charAt(0))) {
+                return new NAMED_INPUT_PIPE(cleanedExp);
             } else { // If the expression has no operators and is more than one character, it's invalid
-                throwError(exp, "Expression was only one non-variable character.");
+                throwError(cleanedExp, "Expression was only one non-variable character.");
             }
         }
 
@@ -49,7 +51,7 @@ class GraphBuilder {
         }
 
         exp = addImpliedParens(exp);
-        exp = removeOuterParens(exp);
+//        exp = removeOuterParens(exp);
 
         // Parentheses must be balanced to be a valid expression
         if(!parensAreBalanced(exp)) {
