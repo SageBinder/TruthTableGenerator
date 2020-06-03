@@ -51,6 +51,9 @@ class GraphBuilder {
         }
 
         exp = addImpliedParens(exp);
+
+        // This line was removed because it fails for expressions such as "(A&B)|(~C)".
+        // Instead, extra parentheses are removed when no operators are found in the expression
 //        exp = removeOuterParens(exp);
 
         // Parentheses must be balanced to be a valid expression
