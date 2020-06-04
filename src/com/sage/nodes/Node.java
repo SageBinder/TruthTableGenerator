@@ -1,5 +1,7 @@
 package com.sage.nodes;
 
+import com.sage.graph.GraphInputs;
+
 import java.util.List;
 
 public abstract class Node {
@@ -13,5 +15,5 @@ public abstract class Node {
         this.inputNodes = List.of(inputNodes);
     }
 
-    protected abstract boolean evaluate();
+    protected abstract boolean evaluate(GraphInputs inputs);
 }

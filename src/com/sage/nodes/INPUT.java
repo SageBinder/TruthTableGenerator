@@ -1,13 +1,23 @@
 package com.sage.nodes;
 
-public class INPUT {
-    private boolean value;
+import com.sage.exceptions.InvalidInputException;
+import com.sage.graph.GraphInputs;
 
-    public void setValue(boolean value) {
-        this.value = value;
+public class INPUT extends Node {
+    public final String name;
+
+    public INPUT(String name) {
+        this.name = name;
     }
 
-    public boolean getValue() {
-        return value;
+    @Override
+    protected boolean evaluate(GraphInputs inputs) {
+        if(inputs.containsKey(name)) {
+            return inputs.get(name);
+        } else {
+            throw new InvalidInputException("Error: input node with the name of \""
+                    + name
+                    + "\" could not find a matching input in the inputs map.");
+        }
     }
 }

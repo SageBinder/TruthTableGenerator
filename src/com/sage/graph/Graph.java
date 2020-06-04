@@ -2,51 +2,35 @@ package com.sage.graph;
 
 import com.sage.nodes.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Graph {
     public final String rawExp;
-    public final OUTPUT outputNode;
+    public final String[] variables;
 
-    public final Map<String, INPUT> inputMap;
+    private final OUTPUT outputNode;
 
     public Graph(String rawExp) {
         this.rawExp = rawExp;
         this.outputNode = GraphBuilder.build(rawExp);
-        this.inputMap = generateInputNodes(outputNode);
+        this.variables = findUniqueVariables(outputNode).toArray(new String[0]);
     }
 
-    private static Map<String, INPUT> generateInputNodes(Node outputNode) {
-        Map<String, INPUT> inputs = new HashMap<>();
-        var inputPipes = getInputPipesRecursively(outputNode);
+    public boolean evaluate(GraphInputs inputs) {
+        return outputNode.evaluate(inputs);
+    }
 
-        for(var inputPipe : inputPipes) {
-            if(inputs.containsKey(inputPipe.name)) {
-                inputPipe.setInput(inputs.get(inputPipe.name));
+    private static Set<String> findUniqueVariables(Node currNode) {
+        Set<String> inputs = new HashSet<>();
+
+        for(Node nextNode : currNode.getInputNodes()) {
+            if(nextNode instanceof INPUT input) {
+                inputs.add(input.name);
             } else {
-                var newInput = new INPUT();
-                inputs.put(inputPipe.name, newInput);
-                inputPipe.setInput(newInput);
+                inputs.addAll(findUniqueVariables(nextNode));
             }
         }
 
         return inputs;
-    }
-
-    private static List<NAMED_INPUT_PIPE> getInputPipesRecursively(Node outputNode) {
-        List<NAMED_INPUT_PIPE> inputPipes = new ArrayList<>();
-
-        for(Node node : outputNode.getInputNodes()) {
-            if(node instanceof NAMED_INPUT_PIPE inputPipe) {
-                inputPipes.add(inputPipe);
-            } else {
-                inputPipes.addAll(getInputPipesRecursively(node));
-            }
-        }
-
-        return inputPipes;
     }
 }

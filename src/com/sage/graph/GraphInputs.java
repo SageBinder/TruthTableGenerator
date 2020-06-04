@@ -1,4 +1,6 @@
 package com.sage.graph;
 
-public class Inputs {
+import java.util.HashMap;
+
+public class GraphInputs extends HashMap<String, Boolean> {
 }

@@ -15,7 +15,7 @@ class GraphBuilder {
 
             // If the expression has no operators and is only one character, it must be a variable
             if(cleanedExp.length() == 1 && isVariableChar(cleanedExp.charAt(0))) {
-                return new NAMED_INPUT_PIPE(cleanedExp);
+                return new INPUT(cleanedExp);
             } else { // If the expression has no operators and is more than one character, it's invalid
                 throwError(cleanedExp, "Expression was only one non-variable character.");
             }

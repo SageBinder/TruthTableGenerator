@@ -1,5 +1,7 @@
 package com.sage.nodes;
 
+import com.sage.graph.GraphInputs;
+
 public class OUTPUT extends Node {
     private final Node inputNode;
 
@@ -9,7 +11,7 @@ public class OUTPUT extends Node {
     }
 
     @Override
-    public boolean evaluate() {
-        return inputNode.evaluate();
+    public boolean evaluate(GraphInputs inputs) {
+        return inputNode.evaluate(inputs);
     }
 }
