@@ -4,7 +4,6 @@ import com.sage.exceptions.InvalidInputException;
 import com.sage.nodes.*;
 
 import java.util.List;
-import java.util.Objects;
 
 class GraphBuilder {
     public static OUTPUT build(String rawExpression) {
@@ -38,6 +37,11 @@ class GraphBuilder {
                     _build(getRightOperand(exp, topOperatorIdx)));
         } else if(Operator.is(topOperator, Operator.IF)) {
             return new IF(
+                    _build(getLeftOperand(exp, topOperatorIdx)),
+                    _build(getRightOperand(exp, topOperatorIdx))
+            );
+        } else if(Operator.is(topOperator, Operator.IFF)) {
+            return new IFF(
                     _build(getLeftOperand(exp, topOperatorIdx)),
                     _build(getRightOperand(exp, topOperatorIdx))
             );
@@ -287,7 +291,8 @@ class GraphBuilder {
         NOT(new char[] { '~', '!' }, false, true),
         AND(new char[] { '&' }, true, true),
         OR(new char[] { '|' }, true, true),
-        IF(new char[] { '>' }, true, true);
+        IF(new char[] { '>' }, true, true),
+        IFF(new char[] { '=' }, true, true);
 
         // The order of the values follows the binding order of the operators (NOT binds tightest)
 
