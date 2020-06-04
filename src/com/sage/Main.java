@@ -8,7 +8,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        String expression = "(A & B) | (~C)";
+        String expression = "A > B";
         Graph graph = new Graph(expression);
 
         System.out.println(expression + "\n");

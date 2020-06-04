@@ -3,6 +3,9 @@ package com.sage.graph;
 import com.sage.exceptions.InvalidInputException;
 import com.sage.nodes.*;
 
+import java.util.List;
+import java.util.Objects;
+
 class GraphBuilder {
     public static OUTPUT build(String rawExpression) {
         return new OUTPUT(_build(preprocessExpression(rawExpression)));
@@ -22,17 +25,22 @@ class GraphBuilder {
         }
 
         char topOperator = exp.charAt(topOperatorIdx);
-        if(Operator.isNOT(topOperator)) {
+        if(Operator.is(topOperator, Operator.NOT)) {
             return new NOT(
                     _build(getRightOperand(exp, topOperatorIdx)));
-        } else if(Operator.isAND(topOperator)) {
+        } else if(Operator.is(topOperator, Operator.AND)) {
             return new AND(
                     _build(getLeftOperand(exp, topOperatorIdx)),
                     _build(getRightOperand(exp, topOperatorIdx)));
-        } else if(Operator.isOR(topOperator)) {
+        } else if(Operator.is(topOperator, Operator.OR)) {
             return new OR(
                     _build(getLeftOperand(exp, topOperatorIdx)),
                     _build(getRightOperand(exp, topOperatorIdx)));
+        } else if(Operator.is(topOperator, Operator.IF)) {
+            return new IF(
+                    _build(getLeftOperand(exp, topOperatorIdx)),
+                    _build(getRightOperand(exp, topOperatorIdx))
+            );
         }
 
         throwError(exp, "the top operator index was >= 0, but no operator was found. This is bad.");
@@ -278,9 +286,10 @@ class GraphBuilder {
     public enum Operator {
         NOT(new char[] { '~', '!' }, false, true),
         AND(new char[] { '&' }, true, true),
-        OR(new char[] { '|' }, true, true);
+        OR(new char[] { '|' }, true, true),
+        IF(new char[] { '>' }, true, true);
 
-        // The order of the values follows the binding order of the operators (NOT binds tightest, OR binds loosest)
+        // The order of the values follows the binding order of the operators (NOT binds tightest)
 
         private final char[] chars;
         public final boolean requiresLeftArg;
@@ -296,20 +305,12 @@ class GraphBuilder {
             return arrContains(chars, c);
         }
 
-        public static boolean isNOT(char c) {
-            return arrContains(NOT.chars, c);
-        }
-
-        public static boolean isAND(char c) {
-            return arrContains(AND.chars, c);
-        }
-
-        public static boolean isOR(char c) {
-            return arrContains(OR.chars, c);
+        public static boolean is(char c, Operator operator) {
+            return operator.hasChar(c);
         }
 
         public static boolean isOperator(char c) {
-            return isNOT(c) || isAND(c) || isOR(c);
+            return List.of(Operator.values()).stream().anyMatch(op -> op.hasChar(c));
         }
 
         private static boolean arrContains(char[] arr, char c) {
