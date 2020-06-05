@@ -7,6 +7,10 @@ public class AND extends Node {
         super(inputs);
     }
 
+    public AND(String tag, Node... inputNodes) {
+        super(tag, inputNodes);
+    }
+
     @Override
     protected boolean evaluate(GraphInputs inputs) {
         return inputNodes.stream().allMatch(node -> node.evaluate(inputs));

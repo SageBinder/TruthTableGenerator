@@ -7,9 +7,13 @@ public class IF extends Node {
     private final Node consequent;
 
     public IF(Node antecedent, Node consequence) {
-        super(antecedent, consequence);
+        this("", antecedent, consequence);
+    }
+
+    public IF(String tag, Node antecedent, Node consequent) {
+        super(tag, antecedent, consequent);
         this.antecedent = antecedent;
-        this.consequent = consequence;
+        this.consequent = consequent;
     }
 
     @Override

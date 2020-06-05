@@ -7,7 +7,8 @@ import com.sage.nodes.OUTPUT;
 
 class GraphBuilder {
     public static OUTPUT build(String rawExpression) {
-        return new OUTPUT(_build(preprocessExpression(rawExpression)));
+        String processedExpression = preprocessExpression(rawExpression);
+        return new OUTPUT(processedExpression, _build(processedExpression));
     }
 
     private static Node _build(String exp) throws InvalidInputException {
@@ -25,6 +26,7 @@ class GraphBuilder {
 
         Operator topLevelOperator = Operator.fromChar(exp.charAt(topOperatorIdx));
         return topLevelOperator.newNode(
+                exp,
                 topLevelOperator.requiresLeftArg ? _build(getLeftOperand(exp, topOperatorIdx)) : null,
                 topLevelOperator.requiresRightArg ? _build(getRightOperand(exp, topOperatorIdx)) : null);
     }

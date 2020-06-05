@@ -20,12 +20,16 @@ public class Graph {
         return outputNode.evaluate(inputs);
     }
 
+    public OUTPUT getOutputNode() {
+        return outputNode;
+    }
+
     private static Set<String> findUniqueVariables(Node currNode) {
         Set<String> inputs = new HashSet<>();
 
         for(Node nextNode : currNode.getInputNodes()) {
             if(nextNode instanceof INPUT input) {
-                inputs.add(input.name);
+                inputs.add(input.tag);
             } else {
                 inputs.addAll(findUniqueVariables(nextNode));
             }

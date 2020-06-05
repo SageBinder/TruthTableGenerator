@@ -8,6 +8,10 @@ public class NOT extends Node {
         super(input);
     }
 
+    public NOT(String tag, Node... inputNodes) {
+        super(tag, inputNodes);
+    }
+
     @Override
     protected boolean evaluate(GraphInputs inputs) {
         if(inputNodes.size() != 1) {

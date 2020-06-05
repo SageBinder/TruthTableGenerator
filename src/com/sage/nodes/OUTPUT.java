@@ -6,7 +6,11 @@ public class OUTPUT extends Node {
     private final Node inputNode;
 
     public OUTPUT(Node inputNode) {
-        super(inputNode);
+        this("", inputNode);
+    }
+
+    public OUTPUT(String tag, Node inputNode) {
+        super(tag, inputNode);
         this.inputNode = inputNode;
     }
 

@@ -6,15 +6,15 @@ import java.util.List;
 
 public enum Operator {
     NOT(new char[] { '~', '!' }, false, true,
-            inputs -> new com.sage.nodes.NOT(inputs[1])),
+            (tag, inputs) -> new com.sage.nodes.NOT(tag, inputs[1])),
     AND(new char[] { '&' }, true, true,
-            inputs -> new com.sage.nodes.AND(inputs[0], inputs[1])),
+            (tag, inputs) -> new com.sage.nodes.AND(tag, inputs[0], inputs[1])),
     OR(new char[] { '|' }, true, true,
-            inputs -> new com.sage.nodes.OR(inputs[0], inputs[1])),
+            (tag, inputs) -> new com.sage.nodes.OR(tag, inputs[0], inputs[1])),
     IF(new char[] { '>' }, true, true,
-            inputs -> new com.sage.nodes.IF(inputs[0], inputs[1])),
+            (tag, inputs) -> new com.sage.nodes.IF(tag, inputs[0], inputs[1])),
     IFF(new char[] { '=' }, true, true,
-            inputs -> new com.sage.nodes.IFF(inputs[0], inputs[1]));
+            (tag, inputs) -> new com.sage.nodes.IFF(tag, inputs[0], inputs[1]));
 
     // The order of the values follows the binding order of the operators (NOT binds tightest)
 
@@ -36,7 +36,11 @@ public enum Operator {
     }
 
     public Node newNode(Node leftInput, Node rightInput) {
-        return constructor.newNode(leftInput, rightInput);
+        return newNode("", leftInput, rightInput);
+    }
+
+    public Node newNode(String tag, Node leftInput, Node rightInput) {
+        return constructor.newNode(tag, leftInput, rightInput);
     }
 
     public static boolean isOperatorChar(char c) {

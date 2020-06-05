@@ -7,10 +7,13 @@ public class IFF extends Node {
     private final Node consequent;
 
     public IFF(Node antecedent, Node consequence) {
-        super(antecedent, consequence);
-        this.antecedent = antecedent;
-        this.consequent = consequence;
+        this("", antecedent, consequence);
+    }
 
+    public IFF(String tag, Node antecedent, Node consequent) {
+        super(tag, antecedent, consequent);
+        this.antecedent = antecedent;
+        this.consequent = consequent;
     }
 
     @Override

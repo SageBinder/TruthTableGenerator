@@ -7,6 +7,10 @@ public class OR extends Node {
         super(inputs);
     }
 
+    public OR(String tag, Node... inputNodes) {
+        super(tag, inputNodes);
+    }
+
     @Override
     protected boolean evaluate(GraphInputs inputs) {
         return inputNodes.stream().anyMatch(node -> node.evaluate(inputs));

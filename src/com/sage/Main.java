@@ -8,10 +8,11 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        String expression = "A & B | ~C";
+        String expression = "A & B | ~C | B";
         Graph graph = new Graph(expression);
 
-        System.out.println(expression + "\n");
+        System.out.println("Raw expression: " + expression);
+        System.out.println("Parsed expression: " + graph.getOutputNode().tag + "\n");
         System.out.println(generateTruthTable(graph));
     }
 

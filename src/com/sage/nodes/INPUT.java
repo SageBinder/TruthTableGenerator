@@ -4,19 +4,17 @@ import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
 
 public class INPUT extends Node {
-    public final String name;
-
-    public INPUT(String name) {
-        this.name = name;
+    public INPUT(String tag) {
+        super(tag);
     }
 
     @Override
     protected boolean evaluate(GraphInputs inputs) {
-        if(inputs.containsKey(name)) {
-            return inputs.get(name);
+        if(inputs.containsKey(tag)) {
+            return inputs.get(tag);
         } else {
             throw new InvalidInputException("Error: input node with the name of \""
-                    + name
+                    + tag
                     + "\" could not find a matching input in the inputs map.");
         }
     }
