@@ -1,9 +1,9 @@
 package com.sage.graph;
 
 import com.sage.exceptions.InvalidInputException;
-import com.sage.nodes.*;
-
-import java.util.List;
+import com.sage.nodes.INPUT;
+import com.sage.nodes.Node;
+import com.sage.nodes.OUTPUT;
 
 class GraphBuilder {
     public static OUTPUT build(String rawExpression) {
@@ -23,32 +23,10 @@ class GraphBuilder {
             }
         }
 
-        char topOperator = exp.charAt(topOperatorIdx);
-        if(Operator.is(topOperator, Operator.NOT)) {
-            return new NOT(
-                    _build(getRightOperand(exp, topOperatorIdx)));
-        } else if(Operator.is(topOperator, Operator.AND)) {
-            return new AND(
-                    _build(getLeftOperand(exp, topOperatorIdx)),
-                    _build(getRightOperand(exp, topOperatorIdx)));
-        } else if(Operator.is(topOperator, Operator.OR)) {
-            return new OR(
-                    _build(getLeftOperand(exp, topOperatorIdx)),
-                    _build(getRightOperand(exp, topOperatorIdx)));
-        } else if(Operator.is(topOperator, Operator.IF)) {
-            return new IF(
-                    _build(getLeftOperand(exp, topOperatorIdx)),
-                    _build(getRightOperand(exp, topOperatorIdx))
-            );
-        } else if(Operator.is(topOperator, Operator.IFF)) {
-            return new IFF(
-                    _build(getLeftOperand(exp, topOperatorIdx)),
-                    _build(getRightOperand(exp, topOperatorIdx))
-            );
-        }
-
-        throwError(exp, "the top operator index was >= 0, but no operator was found. This is bad.");
-        return null;
+        Operator topLevelOperator = Operator.fromChar(exp.charAt(topOperatorIdx));
+        return topLevelOperator.newNode(
+                topLevelOperator.requiresLeftArg ? _build(getLeftOperand(exp, topOperatorIdx)) : null,
+                topLevelOperator.requiresRightArg ? _build(getRightOperand(exp, topOperatorIdx)) : null);
     }
 
     private static String preprocessExpression(String rawExpression) {
@@ -63,10 +41,6 @@ class GraphBuilder {
         }
 
         exp = addImpliedParens(exp);
-
-        // This line was removed because it fails for expressions such as "(A&B)|(~C)".
-        // Instead, extra parentheses are removed when no operators are found in the expression
-//        exp = removeOuterParens(exp);
 
         // Parentheses must be balanced to be a valid expression
         if(!parensAreBalanced(exp)) {
@@ -263,7 +237,7 @@ class GraphBuilder {
         for(int i = 0; i < exp.length(); i++) {
             char c = exp.charAt(i);
 
-            if(Operator.isOperator(c)) {
+            if(Operator.isOperatorChar(c)) {
                 if(currDepth < minOperatorDepth) {
                     minOperatorDepth = currDepth;
                     minOperatorDepthIdx = i;
@@ -284,57 +258,6 @@ class GraphBuilder {
     }
 
     private static void throwError(String exp, String message) throws InvalidInputException {
-        throw new InvalidInputException("Error: " + message + "\nInvalid expression: \"" + exp + "\"");
-    }
-
-    public enum Operator {
-        NOT(new char[] { '~', '!' }, false, true),
-        AND(new char[] { '&' }, true, true),
-        OR(new char[] { '|' }, true, true),
-        IF(new char[] { '>' }, true, true),
-        IFF(new char[] { '=' }, true, true);
-
-        // The order of the values follows the binding order of the operators (NOT binds tightest)
-
-        private final char[] chars;
-        public final boolean requiresLeftArg;
-        public final boolean requiresRightArg;
-
-        Operator(char[] chars, boolean requiresLeftArg, boolean requiresRightArg) {
-            this.chars = chars;
-            this.requiresLeftArg = requiresLeftArg;
-            this.requiresRightArg = requiresRightArg;
-        }
-
-        public boolean hasChar(char c) {
-            return arrContains(chars, c);
-        }
-
-        public static boolean is(char c, Operator operator) {
-            return operator.hasChar(c);
-        }
-
-        public static boolean isOperator(char c) {
-            return List.of(Operator.values()).stream().anyMatch(op -> op.hasChar(c));
-        }
-
-        private static boolean arrContains(char[] arr, char c) {
-            for(char value : arr) {
-                if(value == c) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static Operator fromChar(char c) {
-            for(Operator op : values()) {
-                if(arrContains(op.chars, c)) {
-                    return op;
-                }
-            }
-
-            throw new IllegalArgumentException();
-        }
+        throw new InvalidInputException(message + "\nInvalid expression: \"" + exp + "\"");
     }
 }

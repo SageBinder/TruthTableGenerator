@@ -16,4 +16,8 @@ public abstract class Node {
     }
 
     protected abstract boolean evaluate(GraphInputs inputs);
+
+    public interface NodeConstructor<T extends Node> {
+        public T newNode(Node... inputs);
+    }
 }
