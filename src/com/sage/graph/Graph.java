@@ -20,6 +20,10 @@ public class Graph {
         return outputNode.evaluate(inputs);
     }
 
+    public String getParsedExpression() {
+        return outputNode.getInputNodes()[0].tag;
+    }
+
     public OUTPUT getOutputNode() {
         return outputNode;
     }

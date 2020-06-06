@@ -12,7 +12,7 @@ public class Main {
         Graph graph = new Graph(expression);
 
         System.out.println("Raw expression: " + expression);
-        System.out.println("Parsed expression: " + graph.getOutputNode().tag + "\n");
+        System.out.println("Parsed expression: " + graph.getParsedExpression() + "\n");
         System.out.println(generateTruthTable(graph));
     }
 
