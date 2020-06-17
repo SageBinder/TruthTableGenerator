@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// TODO: Use GraphCharacter.isOpenBracket() and GraphCharacter.isCloseBracket() instead of relying on hard-coded parenthesis strings
+// TODO: Disallow non-identical brackets to match (i.e something like "(A & B]")
 
 public class GraphString {
     private final List<GraphCharacter> string;
@@ -58,9 +58,10 @@ public class GraphString {
 
         int parenDepth = 0;
         for(int i = operatorIdx - 1; i >= 0; i--) {
-            switch(this.charAt(i).toString()) {
-                case ")" -> parenDepth--;
-                case "(" -> parenDepth++;
+            if(this.charAt(i).isOpenBracket()) {
+                parenDepth++;
+            } else if(this.charAt(i).isCloseBracket()) {
+                parenDepth--;
             }
 
             if(parenDepth == 0) {
@@ -86,9 +87,10 @@ public class GraphString {
 
         int parenDepth = 0;
         for(int i = operatorIdx + 1; i < this.length(); i++) {
-            switch(this.charAt(i).toString()) {
-                case ")" -> parenDepth--;
-                case "(" -> parenDepth++;
+            if(this.charAt(i).isOpenBracket()) {
+                parenDepth++;
+            } else if(this.charAt(i).isCloseBracket()) {
+                parenDepth--;
             }
 
             if(parenDepth == 0) {
@@ -112,9 +114,10 @@ public class GraphString {
     private boolean parensAreBalanced() {
         int parenDepth = 0;
         for(var c : string) {
-            switch(c.toString()) {
-                case "(" -> parenDepth++;
-                case ")" -> parenDepth--;
+            if(c.isOpenBracket()) {
+                parenDepth++;
+            } else if(c.isCloseBracket()) {
+                parenDepth--;
             }
 
             if(parenDepth < 0) {
@@ -151,35 +154,37 @@ public class GraphString {
         // Right parenthesis:
         if(op.requiresRightArg) {
             for(int i = operatorIdx + 1, parenDepth = 0; i < initialLength; i++) {
-                switch(charAt(i).toString()) {
-                    case "(" -> parenDepth++;
-                    case ")" -> parenDepth--;
+                if(this.charAt(i).isOpenBracket()) {
+                    parenDepth++;
+                } else if(this.charAt(i).isCloseBracket()) {
+                    parenDepth--;
                 }
 
                 if(parenDepth == 0) {
-                    string.add(i + 1, new GraphCharacter(")"));
+                    string.add(i + 1, new GraphCharacter(GraphCharacter.CLOSE_BRACKETS[0]));
                     break;
                 }
             }
         } else {
-            string.add(operatorIdx + 1, new GraphCharacter(")"));
+            string.add(operatorIdx + 1, new GraphCharacter(GraphCharacter.CLOSE_BRACKETS[0]));
         }
 
         // Left parenthesis
         if(op.requiresLeftArg) {
             for(int i = operatorIdx - 1, parenDepth = 0; i >= 0; i--) {
-                switch(charAt(i).toString()) {
-                    case "(" -> parenDepth++;
-                    case ")" -> parenDepth--;
+                if(this.charAt(i).isOpenBracket()) {
+                    parenDepth++;
+                } else if(this.charAt(i).isCloseBracket()) {
+                    parenDepth--;
                 }
 
                 if(parenDepth == 0) {
-                    string.add(i, new GraphCharacter("("));
+                    string.add(i, new GraphCharacter(GraphCharacter.OPEN_BRACKETS[0]));
                     break;
                 }
             }
         } else {
-            string.add(operatorIdx, new GraphCharacter("("));
+            string.add(operatorIdx, new GraphCharacter(GraphCharacter.OPEN_BRACKETS[0]));
         }
     }
 
@@ -188,24 +193,20 @@ public class GraphString {
 
         if(op.requiresLeftArg) {
             int[] leftOperandIndices = getLeftOperandIndices(operatorIdx);
-            if(!(leftOperandIndices[0] > 0 && charAt(leftOperandIndices[0] - 1).toString().equals("("))) {
+            if(!(leftOperandIndices[0] > 0 && charAt(leftOperandIndices[0] - 1).isOpenBracket())) {
                 return false;
             }
-        } else {
-            if(!(operatorIdx > 0 && charAt(operatorIdx - 1).toString().equals("("))) {
-                return false;
-            }
+        } else if(!(operatorIdx > 0 && charAt(operatorIdx - 1).isOpenBracket())) {
+            return false;
         }
 
         if(op.requiresRightArg) {
             int[] rightOperandIndices = getRightOperandIndices(operatorIdx);
-            if(!(rightOperandIndices[1] < length() - 1 && charAt(rightOperandIndices[1] + 1).toString().equals(")"))) {
+            if(!(rightOperandIndices[1] < length() - 1 && charAt(rightOperandIndices[1] + 1).isCloseBracket())) {
                 return false;
             }
-        } else {
-            if(!(operatorIdx < length() - 1 && charAt(operatorIdx + 1).toString().equals(")"))) {
-                return false;
-            }
+        } else if(!(operatorIdx < length() - 1 && charAt(operatorIdx + 1).isCloseBracket())) {
+            return false;
         }
 
         return true;
@@ -227,16 +228,13 @@ public class GraphString {
         for(int i = 0; i < length(); i++) {
             var c = charAt(i);
 
-            if(c.isOperator()) {
-                if(currDepth < minOperatorDepth) {
-                    minOperatorDepth = currDepth;
-                    minOperatorDepthIdx = i;
-                }
-            } else {
-                switch(c.toString()) {
-                    case "(" -> currDepth++;
-                    case ")" -> currDepth--;
-                }
+            if(c.isOperator() && currDepth < minOperatorDepth) {
+                minOperatorDepth = currDepth;
+                minOperatorDepthIdx = i;
+            } else if(c.isOpenBracket()) {
+                currDepth++;
+            } else if(c.isCloseBracket()) {
+                currDepth--;
             }
         }
 

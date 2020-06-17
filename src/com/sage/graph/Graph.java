@@ -14,6 +14,7 @@ public class Graph {
         this.rawExp = rawExp;
         this.outputNode = GraphBuilder.build(rawExp);
         this.variables = findUniqueVariables(outputNode).toArray(new String[0]);
+        Arrays.sort(variables);
     }
 
     public boolean evaluate(GraphInputs inputs) {

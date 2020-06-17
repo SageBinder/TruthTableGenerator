@@ -3,12 +3,14 @@ package com.sage;
 import com.sage.graph.Graph;
 import com.sage.graph.GraphInputs;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) {
-        String expression = "A & B | ~C | B";
+        String expression = "(Abb & B) | ~C | B | Abb";
         Graph graph = new Graph(expression);
 
         System.out.println("Raw expression: " + expression);
@@ -20,9 +22,19 @@ public class Main {
         String[] variables = graph.variables;
         double numPermutations = Math.pow(2, variables.length);
 
-        var truthTableString = new StringBuilder(String.join(" | ", List.of(variables)) + " | RESULT\n");
+        var truthTableString = new StringBuilder();
+        truthTableString
+                .append(String.join(" | ", List.of(variables)))
+                .append(" | RESULT\n")
+                .append(Arrays.stream(variables)
+                        .map(var -> "-".repeat(var.length()))
+                        .collect(Collectors.joining("-|-")))
+                .append("-|-")
+                .append("-".repeat("RESULT".length()))
+                .append("\n");
 
         for(short currPermutation = 0; currPermutation < numPermutations; currPermutation++) {
+            // Setting up GraphInputs and evaluating graph:
             GraphInputs inputs = new GraphInputs();
             for(short varIdx = 0; varIdx < variables.length; varIdx++) {
                 inputs.put(variables[varIdx], ((1 << varIdx) & currPermutation) > 0);
@@ -30,13 +42,20 @@ public class Main {
 
             boolean result = graph.evaluate(inputs);
 
+            // Generating string for this row of the truth table:
             var currPermutationString = new StringBuilder(Integer.toString(currPermutation, 2));
             currPermutationString
                     .insert(0, "0".repeat(Math.max(0, variables.length - currPermutationString.length())));
 
+            var bitsCharList = currPermutationString.reverse().toString().split("");
+            for(int i = 0; i < bitsCharList.length; i++) {
+                truthTableString
+                        .append(bitsCharList[i])
+                        .append(" ".repeat(variables[i].length() - 1))
+                        .append(" | ");
+            }
+
             truthTableString
-                    .append(String.join(" | ", currPermutationString.reverse().toString().split("")))
-                    .append(" | ")
                     .append(result)
                     .append("\n");
         }
