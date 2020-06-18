@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) {
-        String expression = "A + B || C";
+        String expression = "A + B || C & D > E == F";
         Graph graph = new Graph(expression);
 
         System.out.println("Raw expression: " + expression);

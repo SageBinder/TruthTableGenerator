@@ -148,7 +148,7 @@ public class GraphString {
             // The right parenthesis must be inserted first, so that operatorIdx does not shift.
 
             // Right parenthesis:
-            if(opChar.opType.requiresRightArg) {
+            if(opChar.requiresRightArg()) {
                 for(int i = operatorIdx + 1, parenDepth = 0; i < initialLength; i++) {
                     if(this.charAt(i).isOpenBracket()) {
                         parenDepth++;
@@ -166,7 +166,7 @@ public class GraphString {
             }
 
             // Left parenthesis
-            if(opChar.opType.requiresLeftArg) {
+            if(opChar.requiresLeftArg()) {
                 for(int i = operatorIdx - 1, parenDepth = 0; i >= 0; i--) {
                     if(this.charAt(i).isOpenBracket()) {
                         parenDepth++;
@@ -193,7 +193,7 @@ public class GraphString {
 
     private boolean operatorHasParens(int operatorIdx) {
         if(charAt(operatorIdx) instanceof Operator opChar) {
-            if(opChar.opType.requiresRightArg) {
+            if(opChar.requiresRightArg()) {
                 int[] rightOperandIndices = getRightOperandIndices(operatorIdx);
                 if(!(rightOperandIndices[1] < length() - 1 && charAt(rightOperandIndices[1] + 1).isCloseBracket())) {
                     return false;
@@ -202,7 +202,7 @@ public class GraphString {
                 return false;
             }
 
-            if(opChar.opType.requiresLeftArg) {
+            if(opChar.requiresLeftArg()) {
                 int[] leftOperandIndices = getLeftOperandIndices(operatorIdx);
                 if(!(leftOperandIndices[0] > 0 && charAt(leftOperandIndices[0] - 1).isOpenBracket())) {
                     return false;

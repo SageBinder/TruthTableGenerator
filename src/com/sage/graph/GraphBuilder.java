@@ -4,7 +4,6 @@ import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.expression.GraphString;
 import com.sage.graph.expression.Operator;
 import com.sage.graph.expression.Variable;
-import com.sage.nodes.INPUT;
 import com.sage.nodes.Node;
 import com.sage.nodes.OUTPUT;
 
@@ -24,14 +23,14 @@ class GraphBuilder {
 
             Variable soleVariable = exp.findFirstVariable()
                     .orElseThrow(() -> exp.generateError("No operator was found, but no variable was found either"));
-            return new INPUT(soleVariable.toString());
+            return soleVariable.makeNode(soleVariable.toString(), null, null);
         }
 
         if(exp.charAt(topOperatorIdx) instanceof Operator opChar) {
-            return opChar.opType.newNode(
+            return opChar.makeNode(
                     exp.toString(),
-                    opChar.opType.requiresLeftArg ? _build(exp.getLeftOperand(topOperatorIdx)) : null,
-                    opChar.opType.requiresRightArg ? _build(exp.getRightOperand(topOperatorIdx)) : null);
+                    opChar.requiresLeftArg() ? _build(exp.getLeftOperand(topOperatorIdx)) : null,
+                    opChar.requiresRightArg() ? _build(exp.getRightOperand(topOperatorIdx)) : null);
 
         } else {
             throw exp.generateError("In _build(GraphString exp), topOperatorIdx was >=0, " +

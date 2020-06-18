@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Operator extends GraphCharacter {
+public class Operator extends NodeGraphCharacter {
     public final OpType opType;
 
     public Operator(String character) {
@@ -34,6 +34,23 @@ public class Operator extends GraphCharacter {
                     + toString()
                     + "\"");
         }
+    }
+
+    // If this node does not require an argument, it is ok to pass null for that argument.
+    // i.e, if requireLeftArg() returns false, then the left input node for this method can be null (it will be ignored).
+    @Override
+    public Node makeNode(String tag, Node left, Node right) {
+        return opType.constructor.newNode(tag, left, right);
+    }
+
+    @Override
+    public boolean requiresLeftArg() {
+        return opType.requiresLeftArg;
+    }
+
+    @Override
+    public boolean requiresRightArg() {
+        return opType.requiresRightArg;
     }
 
     public static Pattern getRegex() {
@@ -67,33 +84,21 @@ public class Operator extends GraphCharacter {
                 (tag, inputs) -> new com.sage.nodes.IFF(tag, inputs[0], inputs[1]));
 
         private final Pattern pattern;
-        private final Node.NodeConstructor<Node> constructor;
+        private final NodeConstructor constructor;
 
-        public final boolean requiresLeftArg;
-        public final boolean requiresRightArg;
+        private final boolean requiresLeftArg;
+        private final boolean requiresRightArg;
 
-        OpType(Pattern pattern, boolean requiresLeftArg, boolean requiresRightArg, Node.NodeConstructor<Node> constructor) {
+        OpType(Pattern pattern, boolean requiresLeftArg, boolean requiresRightArg, NodeConstructor constructor) {
             this.pattern = pattern;
             this.requiresLeftArg = requiresLeftArg;
             this.requiresRightArg = requiresRightArg;
             this.constructor = constructor;
         }
 
-        public Node newNode(Node leftInput, Node rightInput) {
-            return newNode("", leftInput, rightInput);
-        }
-
-        public Node newNode(String tag, Node leftInput, Node rightInput) {
-            return constructor.newNode(tag, leftInput, rightInput);
-        }
-
-        public boolean matches(String charInput) {
-            return pattern.matcher(charInput).matches();
-        }
-
-        public static OpType fromString(String opChar) {
+        private static OpType fromString(String opChar) {
             for(var op : values()) {
-                if(op.matches(opChar)) {
+                if(op.pattern.matcher(opChar).matches()) {
                     return op;
                 }
             }
@@ -101,14 +106,12 @@ public class Operator extends GraphCharacter {
             throw new IllegalArgumentException();
         }
 
-        public static boolean isValidOperator(String c) {
-            for(var op : values()) {
-                if(op.matches(c)) {
-                    return true;
-                }
+        private interface NodeConstructor {
+            default Node newNode(Node... inputs) {
+                return newNode("", inputs);
             }
 
-            return false;
+            Node newNode(String tag, Node... inputs);
         }
     }
 }

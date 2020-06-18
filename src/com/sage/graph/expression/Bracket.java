@@ -60,13 +60,9 @@ public class Bracket extends GraphCharacter {
             this.defaultSequence = defaultSequence;
         }
 
-        public boolean matches(String bracketChar) {
-            return pattern.matcher(bracketChar).matches();
-        }
-
-        public static BracketType fromString(String bracketChar) {
+        private static BracketType fromString(String bracketChar) {
             for(var type : values()) {
-                if(type.matches(bracketChar)) {
+                if(type.pattern.matcher(bracketChar).matches()) {
                     return type;
                 }
             }

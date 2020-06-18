@@ -1,6 +1,8 @@
 package com.sage.nodes;
 
+import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
 
@@ -13,6 +15,10 @@ public abstract class Node {
     }
 
     protected Node(String tag, Node... inputNodes) {
+        if(ArrayUtils.contains(inputNodes, null)) {
+            throw new InvalidInputException("Error: Node constructor received a null node as input");
+        }
+
         this.inputNodes = List.of(inputNodes);
         this.tag = tag;
     }
@@ -22,12 +28,4 @@ public abstract class Node {
     }
 
     protected abstract boolean evaluate(GraphInputs inputs);
-
-    public interface NodeConstructor<T extends Node> {
-        default T newNode(Node... inputs) {
-            return newNode("", inputs);
-        }
-
-        T newNode(String tag, Node... inputs);
-    }
 }
