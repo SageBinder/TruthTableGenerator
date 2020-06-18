@@ -5,11 +5,7 @@ import com.sage.graph.GraphInputs;
 import java.util.List;
 
 public abstract class Node {
-    public final Node[] getInputNodes() {
-        return inputNodes.toArray(new Node[0]);
-    }
     public final String tag;
-
     protected final List<Node> inputNodes;
 
     protected Node(Node... inputNodes) {
@@ -19,6 +15,10 @@ public abstract class Node {
     protected Node(String tag, Node... inputNodes) {
         this.inputNodes = List.of(inputNodes);
         this.tag = tag;
+    }
+
+    public final Node[] getInputNodes() {
+        return inputNodes.toArray(new Node[0]);
     }
 
     protected abstract boolean evaluate(GraphInputs inputs);
