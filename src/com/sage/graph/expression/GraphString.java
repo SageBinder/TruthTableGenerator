@@ -1,12 +1,11 @@
-package com.sage.graph;
+package com.sage.graph.expression;
 
 import com.sage.exceptions.InvalidInputException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 // TODO: Disallow non-identical brackets to match (i.e something like "(A & B]")
 
@@ -18,11 +17,8 @@ public class GraphString {
         cleanGraphExpression();
     }
 
-    private GraphString(List<GraphCharacter> string) {
-        this.string = new ArrayList<>();
-        for(var c : string) {
-            this.string.add(new GraphCharacter(c));
-        }
+    private <T extends GraphCharacter> GraphString(List<T> string) {
+        this.string = new ArrayList<>(string);
     }
 
     public GraphCharacter charAt(int i) {
@@ -52,7 +48,7 @@ public class GraphString {
             throwError("getLeftOperandIndices(int idx) received an idx of 0. This is bad.");
         }
 
-        if(!Operator.isOperatorChar(charAt(operatorIdx))) {
+        if(!charAt(operatorIdx).isOperator()) {
             throwError("getLeftOperandIndices(int idx) received and idx of a character which is not an operator");
         }
 
@@ -81,7 +77,7 @@ public class GraphString {
             throwError("getRightOperandIndices(int idx) received an idx of (exp.length() - 1)). This is bad.");
         }
 
-        if(!Operator.isOperatorChar(charAt(operatorIdx))) {
+        if(!charAt(operatorIdx).isOperator()) {
             throwError("getRightOperandIndices(int idx) received and idx of a character which is not an operator");
         }
 
@@ -130,9 +126,9 @@ public class GraphString {
 
     // Is allowed mutate string (only called from constructor)
     private void addImpliedParens() {
-        for(Operator op : Operator.values()) {
+        for(var op : Operator.OpType.values()) {
             for(int i = string.size() - 1; i >= 0; i--) {
-                if(op.hasChar(charAt(i)) && !operatorHasParens(i)) {
+                if(charAt(i) instanceof Operator opChar && opChar.opType == op && !operatorHasParens(i)) {
                     addParensAroundOperator(i);
 
                     // A parenthesis is going to be added somewhere before the operator. This will shift the whole string
@@ -146,77 +142,90 @@ public class GraphString {
 
     // Is allowed mutate string (only called from constructor)
     private void addParensAroundOperator(int operatorIdx) {
-        Operator op = Operator.fromChar(charAt(operatorIdx));
-        int initialLength = length();
+        if(charAt(operatorIdx) instanceof Operator opChar) {
+            int initialLength = length();
 
-        // The right parenthesis must be inserted first, so that operatorIdx does not shift.
+            // The right parenthesis must be inserted first, so that operatorIdx does not shift.
 
-        // Right parenthesis:
-        if(op.requiresRightArg) {
-            for(int i = operatorIdx + 1, parenDepth = 0; i < initialLength; i++) {
-                if(this.charAt(i).isOpenBracket()) {
-                    parenDepth++;
-                } else if(this.charAt(i).isCloseBracket()) {
-                    parenDepth--;
+            // Right parenthesis:
+            if(opChar.opType.requiresRightArg) {
+                for(int i = operatorIdx + 1, parenDepth = 0; i < initialLength; i++) {
+                    if(this.charAt(i).isOpenBracket()) {
+                        parenDepth++;
+                    } else if(this.charAt(i).isCloseBracket()) {
+                        parenDepth--;
+                    }
+
+                    if(parenDepth == 0) {
+                        string.add(i + 1, Bracket.newCloseBracket());
+                        break;
+                    }
                 }
+            } else {
+                string.add(operatorIdx + 1, Bracket.newCloseBracket());
+            }
 
-                if(parenDepth == 0) {
-                    string.add(i + 1, new GraphCharacter(GraphCharacter.CLOSE_BRACKETS[0]));
-                    break;
+            // Left parenthesis
+            if(opChar.opType.requiresLeftArg) {
+                for(int i = operatorIdx - 1, parenDepth = 0; i >= 0; i--) {
+                    if(this.charAt(i).isOpenBracket()) {
+                        parenDepth++;
+                    } else if(this.charAt(i).isCloseBracket()) {
+                        parenDepth--;
+                    }
+
+                    if(parenDepth == 0) {
+                        string.add(i, Bracket.newOpenBracket());
+                        break;
+                    }
                 }
+            } else {
+                string.add(operatorIdx, Bracket.newOpenBracket());
             }
         } else {
-            string.add(operatorIdx + 1, new GraphCharacter(GraphCharacter.CLOSE_BRACKETS[0]));
-        }
-
-        // Left parenthesis
-        if(op.requiresLeftArg) {
-            for(int i = operatorIdx - 1, parenDepth = 0; i >= 0; i--) {
-                if(this.charAt(i).isOpenBracket()) {
-                    parenDepth++;
-                } else if(this.charAt(i).isCloseBracket()) {
-                    parenDepth--;
-                }
-
-                if(parenDepth == 0) {
-                    string.add(i, new GraphCharacter(GraphCharacter.OPEN_BRACKETS[0]));
-                    break;
-                }
-            }
-        } else {
-            string.add(operatorIdx, new GraphCharacter(GraphCharacter.OPEN_BRACKETS[0]));
+            throwError("addParensAroundOperator(int operatorIdx) received the idx of a non-operator GraphCharacter. operatorIdx = "
+                    + operatorIdx
+                    + ", char = '"
+                    + charAt(operatorIdx)
+                    + "'");
         }
     }
 
     private boolean operatorHasParens(int operatorIdx) {
-        Operator op = Operator.fromChar(charAt(operatorIdx));
-
-        if(op.requiresLeftArg) {
-            int[] leftOperandIndices = getLeftOperandIndices(operatorIdx);
-            if(!(leftOperandIndices[0] > 0 && charAt(leftOperandIndices[0] - 1).isOpenBracket())) {
+        if(charAt(operatorIdx) instanceof Operator opChar) {
+            if(opChar.opType.requiresRightArg) {
+                int[] rightOperandIndices = getRightOperandIndices(operatorIdx);
+                if(!(rightOperandIndices[1] < length() - 1 && charAt(rightOperandIndices[1] + 1).isCloseBracket())) {
+                    return false;
+                }
+            } else if(!(operatorIdx < length() - 1 && charAt(operatorIdx + 1).isCloseBracket())) {
                 return false;
             }
-        } else if(!(operatorIdx > 0 && charAt(operatorIdx - 1).isOpenBracket())) {
-            return false;
-        }
 
-        if(op.requiresRightArg) {
-            int[] rightOperandIndices = getRightOperandIndices(operatorIdx);
-            if(!(rightOperandIndices[1] < length() - 1 && charAt(rightOperandIndices[1] + 1).isCloseBracket())) {
+            if(opChar.opType.requiresLeftArg) {
+                int[] leftOperandIndices = getLeftOperandIndices(operatorIdx);
+                if(!(leftOperandIndices[0] > 0 && charAt(leftOperandIndices[0] - 1).isOpenBracket())) {
+                    return false;
+                }
+            } else if(!(operatorIdx > 0 && charAt(operatorIdx - 1).isOpenBracket())) {
                 return false;
             }
-        } else if(!(operatorIdx < length() - 1 && charAt(operatorIdx + 1).isCloseBracket())) {
-            return false;
-        }
 
-        return true;
+            return true;
+        } else {
+            throw generateError("operatorHasParens(int operatorIdx) received the idx of a non-operator GraphCharacter. operatorIdx = "
+                    + operatorIdx
+                    + ", char = '"
+                    + charAt(operatorIdx)
+                    + "'");
+        }
     }
 
-    protected InvalidInputException generateError(String message) {
+    public InvalidInputException generateError(String message) {
         return new InvalidInputException(message + "\nInvalid expression: \"" + toString() + "\"");
     }
 
-    protected void throwError(String message) throws InvalidInputException {
+    public void throwError(String message) throws InvalidInputException {
         throw generateError(message);
     }
 
@@ -245,8 +254,8 @@ public class GraphString {
         return string.stream().filter(GraphCharacter::isVariable).count();
     }
 
-    public Optional<GraphCharacter> findFirstVariable() {
-        return string.stream().filter(GraphCharacter::isVariable).findFirst();
+    public Optional<Variable> findFirstVariable() {
+        return string.stream().filter(GraphCharacter::isVariable).map(c -> (Variable)c).findFirst();
     }
 
     @Override
@@ -289,21 +298,43 @@ public class GraphString {
             return new ArrayList<>();
         }
 
-        StringBuilder currChar = new StringBuilder(Character.toString(exp.charAt(0)));
-        List<GraphCharacter> currString = new ArrayList<>();
+        GraphCharacter[] string = new GraphCharacter[exp.length()];
+        Matcher matcher;
 
-        if(GraphCharacter.isVariableChar(currChar.charAt(0))) {
-            int i = 1;
-            for(char c; i < exp.length() && GraphCharacter.isVariableChar((c = exp.charAt(i))); i++) {
-                currChar.append(c);
+        // We must keep track of which characters have already been interpreted, so that characters will not be double
+        // interpreted by two or more GraphCharacters
+        Set<Integer> expIndicesAlreadyUsed = new HashSet<>();
+
+        for(var charType : GraphCharacter.CharacterType.values()) {
+            matcher = charType.matcher(exp);
+            while(matcher.find()) {
+                Set<Integer> matchedRange =
+                        IntStream.range(matcher.start(), matcher.end())
+                                .boxed()
+                                .collect(Collectors.toSet());
+
+
+                // Calculate the intersection between the current matched range and the previous matched ranges
+                Set<Integer> rangeIntersection = new HashSet<>(matchedRange);
+                rangeIntersection.retainAll(expIndicesAlreadyUsed);
+
+                // If there's no intersection, none of the chars are being doubly interpreted, so we can go ahead and
+                // interpret the regex match
+                if(rangeIntersection.size() == 0) {
+                    string[matcher.start()] = charType.newGraphCharacter(matcher.group());
+
+                    // Add the matched range to the set of previously matched ranges.
+                    expIndicesAlreadyUsed.addAll(matchedRange);
+                }
+
+                if(matcher.hitEnd()) {
+                    break;
+                }
             }
         }
-        currString.add(new GraphCharacter(currChar.toString()));
 
-        if(currChar.length() < exp.length()) {
-            currString.addAll(stringToGraphString(exp.substring(currChar.length())));
-        }
-
-        return currString;
+        return Arrays.stream(string)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }
