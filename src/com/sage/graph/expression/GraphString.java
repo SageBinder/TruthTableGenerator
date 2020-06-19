@@ -15,8 +15,6 @@ public class GraphString {
     public GraphString(String rawExpression, ParseMode parseMode) {
         string = stringToGraphString(cleanRawExpression(rawExpression), parseMode);
         cleanGraphExpression();
-
-        System.out.println(string.stream().map(GraphCharacter::toString).collect(Collectors.joining(" ")));
     }
 
     private <T extends GraphCharacter> GraphString(List<T> string) {
