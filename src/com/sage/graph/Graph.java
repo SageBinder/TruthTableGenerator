@@ -1,8 +1,13 @@
 package com.sage.graph;
 
-import com.sage.nodes.*;
+import com.sage.graph.expression.ParseMode;
+import com.sage.nodes.Node;
+import com.sage.nodes.OUTPUT;
+import com.sage.nodes.VARIABLE;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Graph {
     public final String rawExp;
@@ -10,9 +15,9 @@ public class Graph {
 
     private final OUTPUT outputNode;
 
-    public Graph(String rawExp) {
+    public Graph(String rawExp, ParseMode parseMode) {
         this.rawExp = rawExp;
-        this.outputNode = GraphBuilder.build(rawExp);
+        this.outputNode = GraphBuilder.build(rawExp, parseMode);
         this.variables = findUniqueVariables(outputNode).toArray(new String[0]);
         Arrays.sort(variables);
     }
@@ -33,8 +38,8 @@ public class Graph {
         Set<String> inputs = new HashSet<>();
 
         for(Node nextNode : currNode.getInputNodes()) {
-            if(nextNode instanceof INPUT input) {
-                inputs.add(input.tag);
+            if(nextNode instanceof VARIABLE var) {
+                inputs.add(var.tag);
             } else {
                 inputs.addAll(findUniqueVariables(nextNode));
             }

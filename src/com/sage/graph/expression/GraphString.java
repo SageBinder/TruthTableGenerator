@@ -12,9 +12,11 @@ import java.util.stream.IntStream;
 public class GraphString {
     private final List<GraphCharacter> string;
 
-    public GraphString(String rawExpression) {
-        string = stringToGraphString(cleanRawExpression(rawExpression));
+    public GraphString(String rawExpression, ParseMode parseMode) {
+        string = stringToGraphString(cleanRawExpression(rawExpression), parseMode);
         cleanGraphExpression();
+
+        System.out.println(string.stream().map(GraphCharacter::toString).collect(Collectors.joining(" ")));
     }
 
     private <T extends GraphCharacter> GraphString(List<T> string) {
@@ -150,6 +152,10 @@ public class GraphString {
             // Right parenthesis:
             if(opChar.requiresRightArg()) {
                 for(int i = operatorIdx + 1, parenDepth = 0; i < initialLength; i++) {
+                    if(this.charAt(i) instanceof Operator op && op.requiresRightArg()) {
+                        continue; // We don't want to cut off the operator from its right arg by placing a parenthesis
+                    }
+
                     if(this.charAt(i).isOpenBracket()) {
                         parenDepth++;
                     } else if(this.charAt(i).isCloseBracket()) {
@@ -168,6 +174,10 @@ public class GraphString {
             // Left parenthesis
             if(opChar.requiresLeftArg()) {
                 for(int i = operatorIdx - 1, parenDepth = 0; i >= 0; i--) {
+                    if(this.charAt(i) instanceof Operator op && op.requiresLeftArg()) {
+                        continue; // We don't want to cut off the operator from its left arg by placing a parenthesis
+                    }
+
                     if(this.charAt(i).isOpenBracket()) {
                         parenDepth++;
                     } else if(this.charAt(i).isCloseBracket()) {
@@ -250,14 +260,6 @@ public class GraphString {
         return minOperatorDepthIdx;
     }
 
-    public long numVariables() {
-        return string.stream().filter(GraphCharacter::isVariable).count();
-    }
-
-    public Optional<Variable> findFirstVariable() {
-        return string.stream().filter(GraphCharacter::isVariable).map(c -> (Variable)c).findFirst();
-    }
-
     @Override
     public String toString() {
         return string.stream().map(GraphCharacter::toString).collect(Collectors.joining());
@@ -293,7 +295,7 @@ public class GraphString {
         return exp;
     }
 
-    private static List<GraphCharacter> stringToGraphString(String exp) {
+    private static List<GraphCharacter> stringToGraphString(String exp, ParseMode parseMode) {
         if(exp.isEmpty()) {
             return new ArrayList<>();
         }
@@ -306,7 +308,7 @@ public class GraphString {
         Set<Integer> expIndicesAlreadyUsed = new HashSet<>();
 
         for(var charType : GraphCharacter.CharacterType.values()) {
-            matcher = charType.matcher(exp);
+            matcher = charType.matcher(exp, parseMode);
             while(matcher.find()) {
                 Set<Integer> matchedRange =
                         IntStream.range(matcher.start(), matcher.end())
@@ -321,9 +323,9 @@ public class GraphString {
                 // If there's no intersection, none of the chars are being doubly interpreted, so we can go ahead and
                 // interpret the regex match
                 if(rangeIntersection.size() == 0) {
-                    string[matcher.start()] = charType.newGraphCharacter(matcher.group());
+                    string[matcher.start()] = charType.newGraphCharacter(matcher.group(), parseMode);
 
-                    // Add the matched range to the set of previously matched ranges.
+                    // Add the matched range to the set of previously matched ranges
                     expIndicesAlreadyUsed.addAll(matchedRange);
                 }
 

@@ -3,8 +3,8 @@ package com.sage.nodes;
 import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
 
-public class INPUT extends Node {
-    public INPUT(String tag) {
+public class VARIABLE extends Node {
+    public VARIABLE(String tag) {
         super(tag);
     }
 
@@ -13,7 +13,7 @@ public class INPUT extends Node {
         if(inputs.containsKey(tag)) {
             return inputs.get(tag);
         } else {
-            throw new InvalidInputException("Error: input node with the name of \""
+            throw new InvalidInputException("Error: VARIABLE node with the name of \""
                     + tag
                     + "\" could not find a matching input in the inputs map.");
         }

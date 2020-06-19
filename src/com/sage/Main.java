@@ -2,6 +2,7 @@ package com.sage;
 
 import com.sage.graph.Graph;
 import com.sage.graph.GraphInputs;
+import com.sage.graph.expression.ParseMode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,8 +11,8 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) {
-        String expression = "A + B || C & D > E == F";
-        Graph graph = new Graph(expression);
+        String expression = "(Ex)(y)A|(y)By||C";
+        Graph graph = new Graph(expression, ParseMode.PL);
 
         System.out.println("Raw expression: " + expression);
         System.out.println("Parsed expression: " + graph.getParsedExpression() + "\n");
@@ -20,7 +21,7 @@ public class Main {
 
     public static String generateTruthTable(Graph graph) {
         String[] variables = graph.variables;
-        double numPermutations = Math.pow(2, variables.length);
+        double numPermutations = variables.length == 0 ? 0 : Math.pow(2, variables.length);
 
         var truthTableString = new StringBuilder();
         truthTableString
