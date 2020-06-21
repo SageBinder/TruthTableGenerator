@@ -11,11 +11,12 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) {
-        String expression = "(Ex)(y)A|(y)By||C";
+        String expression = "A|B&&C";
         Graph graph = new Graph(expression, ParseMode.PL);
 
         System.out.println("Raw expression: " + expression);
-        System.out.println("Parsed expression: " + graph.getParsedExpression() + "\n");
+        System.out.println("Parsed expression: " + graph.getParsedExpression());
+        System.out.println("Parsed expression with spaces: " + graph.getParsedExpression(" ") + "\n");
         System.out.println(generateTruthTable(graph));
     }
 

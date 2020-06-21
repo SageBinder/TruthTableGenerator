@@ -1,5 +1,6 @@
 package com.sage.graph;
 
+import com.sage.graph.expression.GraphString;
 import com.sage.graph.expression.ParseMode;
 import com.sage.nodes.Node;
 import com.sage.nodes.OUTPUT;
@@ -13,11 +14,14 @@ public class Graph {
     public final String rawExp;
     public final String[] variables;
 
+    public final GraphString graphString;
+
     private final OUTPUT outputNode;
 
     public Graph(String rawExp, ParseMode parseMode) {
         this.rawExp = rawExp;
-        this.outputNode = GraphBuilder.build(rawExp, parseMode);
+        this.graphString = new GraphString(rawExp, parseMode);
+        this.outputNode = GraphBuilder.build(graphString);
         this.variables = findUniqueVariables(outputNode).toArray(new String[0]);
         Arrays.sort(variables);
     }
@@ -28,6 +32,10 @@ public class Graph {
 
     public String getParsedExpression() {
         return outputNode.getInputNodes()[0].tag;
+    }
+
+    public String getParsedExpression(String delimiter) {
+        return String.join(delimiter, graphString.toStringArray());
     }
 
     public OUTPUT getOutputNode() {
