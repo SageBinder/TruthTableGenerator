@@ -31,7 +31,7 @@ public class Graph {
     }
 
     public String getParsedExpression() {
-        return outputNode.getInputNodes()[0].tag;
+        return getParsedExpression("");
     }
 
     public String getParsedExpression(String delimiter) {

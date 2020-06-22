@@ -5,6 +5,7 @@ import com.sage.nodes.Node;
 import com.sage.nodes.VARIABLE;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +33,7 @@ public class GraphCharacter {
     // If this node does not require an argument, it is ok to pass null for that argument.
     // i.e, if requireLeftArg() returns false, then the left input node for this method can be null (it will be ignored).
     public Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
-        return charType.makeNode(tag, left, right, parseMode);
+        return charType.makeNode(tag, character, left, right, parseMode);
     }
 
     public boolean isOperator() {
@@ -103,8 +104,9 @@ public class GraphCharacter {
         // The order of the values MUST follow the binding order of the operators (quantifiers binds tightest)
         EXISTENTIAL_QUANTIFIER(false, true) {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
-                return new com.sage.nodes.EXISTENTIAL_QUANTIFIER(tag, right);
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
+                String bindingVariable = String.valueOf(character.charAt(2)); // LAZY
+                return new com.sage.nodes.EXISTENTIAL_QUANTIFIER(tag, bindingVariable, right);
             }
 
             @Override
@@ -115,8 +117,9 @@ public class GraphCharacter {
 
         UNIVERSAL_QUANTIFIER(false, true) {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
-                return new com.sage.nodes.UNIVERSAL_QUANTIFIER(tag, right);
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
+                String bindingVariable = String.valueOf(character.charAt(1)); // LAZY
+                return new com.sage.nodes.UNIVERSAL_QUANTIFIER(tag, bindingVariable, right);
             }
 
             @Override
@@ -129,8 +132,10 @@ public class GraphCharacter {
         // However, QUANTIFIED_VARIABLE must come before VARIABLE, because a quantified variable will match both regexes.
         QUANTIFIED_VARIABLE(false, false) {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
-                return new com.sage.nodes.QUANTIFIED_VARIABLE(tag);
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
+                List<String> variables = List.of(character.substring(1).split(""));
+                String variableName = String.valueOf(character.charAt(0));
+                return new com.sage.nodes.QUANTIFIED_VARIABLE(tag, variableName, variables);
             }
 
             @Override
@@ -141,7 +146,7 @@ public class GraphCharacter {
 
         VARIABLE(false, false) {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 // Brackets in the variable's tag name are removed
                 return new VARIABLE(
                         tag.replaceAll(
@@ -157,7 +162,7 @@ public class GraphCharacter {
 
         NOT(false, true) {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.NOT(tag, right);
             }
 
@@ -169,7 +174,7 @@ public class GraphCharacter {
 
         AND() {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.AND(tag, left, right);
             }
 
@@ -181,7 +186,7 @@ public class GraphCharacter {
 
         OR() {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.OR(tag, left, right);
             }
 
@@ -193,7 +198,7 @@ public class GraphCharacter {
 
         IF() {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.IF(tag, left, right);
             }
 
@@ -205,7 +210,7 @@ public class GraphCharacter {
 
         IFF() {
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.IFF(tag, left, right);
             }
 
@@ -222,7 +227,7 @@ public class GraphCharacter {
             }
 
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 throw new UnsupportedOperationException("Error: cannot create node from open bracket");
             }
         },
@@ -234,7 +239,7 @@ public class GraphCharacter {
             }
 
             @Override
-            Node makeNode(String tag, Node left, Node right, ParseMode parseMode) {
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 throw new UnsupportedOperationException("Error: cannot create node from close bracket");
             }
         };
@@ -263,7 +268,7 @@ public class GraphCharacter {
             throw new IllegalArgumentException();
         }
 
-        abstract Node makeNode(String tag, Node left, Node right, ParseMode parseMode);
+        abstract Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode);
 
         abstract Pattern getPattern(ParseMode parseMode);
     }

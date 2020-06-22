@@ -329,7 +329,6 @@ public class GraphString {
                             .boxed()
                             .collect(Collectors.toSet());
 
-
             // Calculate the intersection between the current matched range and the previous matched ranges
             Set<Integer> rangeIntersection = new HashSet<>(matchedRange);
             rangeIntersection.retainAll(expIndicesAlreadyUsed);

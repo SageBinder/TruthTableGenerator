@@ -28,4 +28,9 @@ public abstract class Node {
     }
 
     protected abstract boolean evaluate(GraphInputs inputs);
+
+    @Override
+    public String toString() {
+        return tag;
+    }
 }
