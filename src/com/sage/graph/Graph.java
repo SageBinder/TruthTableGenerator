@@ -2,9 +2,9 @@ package com.sage.graph;
 
 import com.sage.graph.expression.GraphString;
 import com.sage.graph.expression.ParseMode;
-import com.sage.nodes.Node;
 import com.sage.nodes.OUTPUT;
 import com.sage.nodes.VARIABLE;
+import com.sage.nodes.base.Node;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,7 +45,7 @@ public class Graph {
     private static Set<String> findUniqueVariables(Node currNode) {
         Set<String> inputs = new HashSet<>();
 
-        for(Node nextNode : currNode.getInputNodes()) {
+        for(Node nextNode : currNode.getParents()) {
             if(nextNode instanceof VARIABLE var) {
                 inputs.add(var.tag);
             } else {

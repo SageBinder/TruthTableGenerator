@@ -1,23 +1,20 @@
 package com.sage.nodes;
 
 import com.sage.graph.GraphInputs;
+import com.sage.nodes.base.Node;
+import com.sage.nodes.base.Node2;
 
-public class IF extends Node {
-    private final Node antecedent;
-    private final Node consequent;
-
+public class IF extends Node2 {
     public IF(Node antecedent, Node consequence) {
         this("", antecedent, consequence);
     }
 
     public IF(String tag, Node antecedent, Node consequent) {
         super(tag, antecedent, consequent);
-        this.antecedent = antecedent;
-        this.consequent = consequent;
     }
 
     @Override
-    protected boolean evaluate(GraphInputs inputs) {
+    protected boolean _evaluate(Node antecedent, Node consequent, GraphInputs inputs) {
         return !antecedent.evaluate(inputs) || consequent.evaluate(inputs);
     }
 }

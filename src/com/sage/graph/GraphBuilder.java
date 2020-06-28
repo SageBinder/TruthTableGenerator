@@ -2,8 +2,8 @@ package com.sage.graph;
 
 import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.expression.GraphString;
-import com.sage.nodes.Node;
 import com.sage.nodes.OUTPUT;
+import com.sage.nodes.base.Node;
 
 class GraphBuilder {
     public static OUTPUT build(GraphString graphString) {

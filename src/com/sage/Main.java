@@ -12,16 +12,15 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) {
-        String expression = "(x)Ax"; // There exists an x with property A
+        String expression = "(Ex)(Ey)Axy"; // There exists an x with property A
         Graph graph = new Graph(expression, ParseMode.PL);
 
         var UD = new GraphInputs.UniverseOfDiscourse();
-        UD.add("a");
+        UD.add("a", "b", "c");
 
         var sentenceMap = new GraphInputs.SentenceMap();
 
         var truthSet = new HashSet<GraphInputs.SentenceMap.TruthEntry>();
-        truthSet.add(new GraphInputs.SentenceMap.TruthEntry("a"));
         truthSet.add(new GraphInputs.SentenceMap.TruthEntry("a", "b"));
 
         sentenceMap.put("A", truthSet);

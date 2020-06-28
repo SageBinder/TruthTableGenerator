@@ -2,19 +2,19 @@ package com.sage.nodes;
 
 import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
+import com.sage.nodes.base.Node;
+import com.sage.nodes.base.Node1;
 
-public class EXISTENTIAL_QUANTIFIER extends Node {
-    private final Node node;
+public class EXISTENTIAL_QUANTIFIER extends Node1 {
     private final String bindingVariable;
 
     public EXISTENTIAL_QUANTIFIER(String tag, String bindingVariable, Node node) {
         super(tag, node);
-        this.node = node;
         this.bindingVariable = bindingVariable;
     }
 
     @Override
-    protected boolean evaluate(GraphInputs inputs) {
+    protected boolean _evaluate(Node parent, GraphInputs inputs) {
         var UD = inputs.getUD().orElseThrow(() ->
                 new InvalidInputException("Error: EXISTENTIAL_QUANTIFIER node could not find any universe of discourse"));
 
@@ -25,7 +25,7 @@ public class EXISTENTIAL_QUANTIFIER extends Node {
             newMap.put(bindingVariable, var);
             inputs.setBoundedVariableMap(newMap);
 
-            return node.evaluate(inputs);
+            return parent.evaluate(inputs);
         });
     }
 }

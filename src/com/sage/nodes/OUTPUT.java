@@ -1,21 +1,20 @@
 package com.sage.nodes;
 
 import com.sage.graph.GraphInputs;
+import com.sage.nodes.base.Node;
+import com.sage.nodes.base.Node1;
 
-public class OUTPUT extends Node {
-    private final Node inputNode;
-
-    public OUTPUT(Node inputNode) {
-        this("", inputNode);
+public class OUTPUT extends Node1 {
+    public OUTPUT(Node parent) {
+        this("", parent);
     }
 
-    public OUTPUT(String tag, Node inputNode) {
-        super(tag, inputNode);
-        this.inputNode = inputNode;
+    public OUTPUT(String tag, Node parent) {
+        super(tag, parent);
     }
 
     @Override
-    public boolean evaluate(GraphInputs inputs) {
-        return inputNode.evaluate(inputs);
+    public boolean _evaluate(Node parent, GraphInputs inputs) {
+        return parent.evaluate(inputs);
     }
 }

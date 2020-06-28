@@ -1,23 +1,20 @@
 package com.sage.nodes;
 
-import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
+import com.sage.nodes.base.Node;
+import com.sage.nodes.base.Node1;
 
-public class NOT extends Node {
+public class NOT extends Node1 {
     public NOT(Node input) {
         super(input);
     }
 
-    public NOT(String tag, Node... inputNodes) {
-        super(tag, inputNodes);
+    public NOT(String tag, Node input) {
+        super(tag, input);
     }
 
     @Override
-    protected boolean evaluate(GraphInputs inputs) {
-        if(inputNodes.size() != 1) {
-            throw new InvalidInputException();
-        }
-
-        return !inputNodes.get(0).evaluate(inputs);
+    protected boolean _evaluate(Node parent, GraphInputs inputs) {
+        return !parent.evaluate(inputs);
     }
 }

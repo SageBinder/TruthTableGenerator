@@ -1,8 +1,8 @@
 package com.sage.graph.expression;
 
 import com.sage.exceptions.InvalidInputException;
-import com.sage.nodes.Node;
 import com.sage.nodes.VARIABLE;
+import com.sage.nodes.base.Node;
 
 import java.util.Arrays;
 import java.util.List;

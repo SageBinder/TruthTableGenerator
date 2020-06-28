@@ -2,16 +2,17 @@ package com.sage.nodes;
 
 import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
+import com.sage.nodes.base.Node0;
 
 import java.util.Map;
 
-public class VARIABLE extends Node {
+public class VARIABLE extends Node0 {
     public VARIABLE(String tag) {
         super(tag);
     }
 
     @Override
-    protected boolean evaluate(GraphInputs inputs) {
+    public boolean _evaluate(GraphInputs inputs) {
         var variableMapOptional = inputs.getBooleanVariableMap();
 
         if(variableMapOptional.isPresent()) {
