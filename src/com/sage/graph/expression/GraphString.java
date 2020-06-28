@@ -43,7 +43,7 @@ public class GraphString {
     }
 
     public int[] getLeftOperandIndices(int operatorIdx) {
-        if(operatorIdx >= this.length() || operatorIdx < 0) {
+        if(operatorIdx >= length() || operatorIdx < 0) {
             throwError("getLeftOperandIndices(int idx) received an out-of-bounds index. This is bad.");
         }
 
@@ -57,9 +57,9 @@ public class GraphString {
 
         int parenDepth = 0;
         for(int i = operatorIdx - 1; i >= 0; i--) {
-            if(this.charAt(i).isOpenBracket()) {
+            if(charAt(i).isOpenBracket()) {
                 parenDepth++;
-            } else if(this.charAt(i).isCloseBracket()) {
+            } else if(charAt(i).isCloseBracket()) {
                 parenDepth--;
             }
 
@@ -72,11 +72,11 @@ public class GraphString {
     }
 
     public int[] getRightOperandIndices(int operatorIdx) {
-        if(operatorIdx >= this.length() || operatorIdx < 0) {
+        if(operatorIdx >= length() || operatorIdx < 0) {
             throwError("getRightOperandIndices(int idx) received an out-of-bounds index. This is bad.");
         }
 
-        if(operatorIdx == this.length() - 1) {
+        if(operatorIdx == length() - 1) {
             throwError("getRightOperandIndices(int idx) received an idx of (exp.length() - 1)). This is bad.");
         }
 
@@ -85,10 +85,10 @@ public class GraphString {
         }
 
         int parenDepth = 0;
-        for(int i = operatorIdx + 1; i < this.length(); i++) {
-            if(this.charAt(i).isOpenBracket()) {
+        for(int i = operatorIdx + 1; i < length(); i++) {
+            if(charAt(i).isOpenBracket()) {
                 parenDepth++;
-            } else if(this.charAt(i).isCloseBracket()) {
+            } else if(charAt(i).isCloseBracket()) {
                 parenDepth--;
             }
 
@@ -97,7 +97,7 @@ public class GraphString {
             }
         }
 
-        return new int[] { operatorIdx + 1, this.length() - 1 };
+        return new int[] { operatorIdx + 1, length() - 1 };
     }
 
     private void cleanGraphExpression() {
@@ -129,15 +129,14 @@ public class GraphString {
 
     // Is allowed mutate string (only called from constructor)
     private void addImpliedParens() {
-        for(var charType : GraphCharacter.GraphCharacterType.values()) {
-            if(charType == GraphCharacter.GraphCharacterType.OPEN_BRACKET
-                    || charType == GraphCharacter.GraphCharacterType.CLOSE_BRACKET) { // UGH, TREATING BRACKETS LIKE A SPECIAL CASE. FIX THIS.
+        for(var currCharType : GraphCharacter.Type.values()) {
+            if(currCharType.category == GraphCharacter.Category.BRACKET) {
                 continue;
             }
 
             for(int i = string.size() - 1; i >= 0; i--) {
                 var c = charAt(i);
-                if(c.charType == charType && !operatorHasParens(i)) {
+                if(c.charType == currCharType && !operatorHasParens(i)) {
                     addParensAroundOperator(i);
 
                     // A parenthesis is going to be added somewhere before the operator. This will shift the whole string
@@ -167,7 +166,7 @@ public class GraphString {
 
                     if(c.isOpenBracket()) {
                         parenDepth++;
-                    } else if(this.charAt(i).isCloseBracket()) {
+                    } else if(charAt(i).isCloseBracket()) {
                         parenDepth--;
                     }
 

@@ -17,12 +17,14 @@ public class GraphCharacter {
 
     private final String character;
 
-    public final GraphCharacterType charType;
+    public final Type charType;
+    public final Category category;
 
     public GraphCharacter(String character, ParseMode parseMode) {
         this.character = character;
         try {
-            this.charType = GraphCharacterType.fromString(toString(), parseMode);
+            this.charType = Type.fromString(toString(), parseMode);
+            this.category = charType.category;
         } catch(IllegalArgumentException e) {
             throw new InvalidInputException("Error: could not construct an operator from the string \""
                     + toString()
@@ -36,11 +38,6 @@ public class GraphCharacter {
         return charType.makeNode(tag, character, left, right, parseMode);
     }
 
-    public boolean isOperator() {
-        // TODO: Find a better, more programmatic way to do this (I want to try to avoid treating brackets as special cases)
-        return charType != GraphCharacterType.OPEN_BRACKET && charType != GraphCharacterType.CLOSE_BRACKET;
-    }
-
     public boolean requiresLeftArg() {
         return charType.requiresLeftArg;
     }
@@ -49,16 +46,20 @@ public class GraphCharacter {
         return charType.requiresRightArg;
     }
 
+    public boolean isOperator() {
+        return category == Category.OPERATOR;
+    }
+
     public boolean isBracket() {
-        return !isOpenBracket() && !isCloseBracket();
+        return category == Category.BRACKET;
     }
 
     public boolean isOpenBracket() {
-        return this.charType == GraphCharacterType.OPEN_BRACKET;
+        return charType == Type.OPEN_BRACKET;
     }
 
     public boolean isCloseBracket() {
-        return this.charType == GraphCharacterType.CLOSE_BRACKET;
+        return charType == Type.CLOSE_BRACKET;
     }
 
     @Override
@@ -90,19 +91,19 @@ public class GraphCharacter {
     }
 
     public static Matcher getNewCombinedMatcher(String exp, ParseMode parseMode) {
-        return combinePatterns(GraphCharacterType.values(), parseMode).matcher(exp);
+        return combinePatterns(Type.values(), parseMode).matcher(exp);
     }
 
-    private static Pattern combinePatterns(GraphCharacterType[] types, ParseMode parseMode) {
+    private static Pattern combinePatterns(Type[] types, ParseMode parseMode) {
         return Pattern.compile(
                 Arrays.stream(types)
                         .map(type -> type.getPattern(parseMode).toString())
                         .collect(Collectors.joining("|")));
     }
 
-    public enum GraphCharacterType {
+    public enum Type {
         // The order of the values MUST follow the binding order of the operators (quantifiers binds tightest)
-        EXISTENTIAL_QUANTIFIER(false, true) {
+        EXISTENTIAL_QUANTIFIER(Category.OPERATOR, false, true) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 String bindingVariable = String.valueOf(character.charAt(2)); // LAZY
@@ -115,7 +116,7 @@ public class GraphCharacter {
             }
         },
 
-        UNIVERSAL_QUANTIFIER(false, true) {
+        UNIVERSAL_QUANTIFIER(Category.OPERATOR, false, true) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 String bindingVariable = String.valueOf(character.charAt(1)); // LAZY
@@ -130,7 +131,7 @@ public class GraphCharacter {
 
         // The variable values won't affect binding order, because they don't bind to anything.
         // However, QUANTIFIED_VARIABLE must come before VARIABLE, because a quantified variable will match both regexes.
-        QUANTIFIED_VARIABLE(false, false) {
+        QUANTIFIED_VARIABLE(Category.OPERATOR, false, false) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 List<String> variables = List.of(character.substring(1).split(""));
@@ -144,13 +145,13 @@ public class GraphCharacter {
             }
         },
 
-        VARIABLE(false, false) {
+        VARIABLE(Category.OPERATOR, false, false) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 // Brackets in the variable's tag name are removed
                 return new VARIABLE(
                         tag.replaceAll(
-                                combinePatterns(new GraphCharacterType[] { OPEN_BRACKET, CLOSE_BRACKET }, parseMode).toString(),
+                                combinePatterns(new Type[] { OPEN_BRACKET, CLOSE_BRACKET }, parseMode).toString(),
                                 ""));
             }
 
@@ -160,7 +161,7 @@ public class GraphCharacter {
             }
         },
 
-        NOT(false, true) {
+        NOT(Category.OPERATOR, false, true) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.NOT(tag, right);
@@ -172,7 +173,7 @@ public class GraphCharacter {
             }
         },
 
-        AND() {
+        AND(Category.OPERATOR) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.AND(tag, left, right);
@@ -184,7 +185,7 @@ public class GraphCharacter {
             }
         },
 
-        NAND() {
+        NAND(Category.OPERATOR) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.NAND(tag, left, right);
@@ -196,7 +197,7 @@ public class GraphCharacter {
             }
         },
 
-        OR() {
+        OR(Category.OPERATOR) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.OR(tag, left, right);
@@ -208,7 +209,7 @@ public class GraphCharacter {
             }
         },
 
-        IF() {
+        IF(Category.OPERATOR) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.IF(tag, left, right);
@@ -220,7 +221,7 @@ public class GraphCharacter {
             }
         },
 
-        IFF() {
+        IFF(Category.OPERATOR) {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
                 return new com.sage.nodes.IFF(tag, left, right);
@@ -232,7 +233,7 @@ public class GraphCharacter {
             }
         },
 
-        OPEN_BRACKET(false, false) {
+        OPEN_BRACKET(Category.BRACKET, false, false) {
             @Override
             public Pattern getPattern(ParseMode parseMode) {
                 return Pattern.compile("[\\[{(]");
@@ -244,7 +245,7 @@ public class GraphCharacter {
             }
         },
 
-        CLOSE_BRACKET(false, false) {
+        CLOSE_BRACKET(Category.BRACKET, false, false) {
             @Override
             public Pattern getPattern(ParseMode parseMode) {
                 return Pattern.compile("[]})]");
@@ -261,16 +262,19 @@ public class GraphCharacter {
         public final boolean requiresLeftArg;
         public final boolean requiresRightArg;
 
-        GraphCharacterType() {
-            this(true, true);
+        public final Category category;
+
+        Type(Category category) {
+            this(category, true, true);
         }
 
-        GraphCharacterType(boolean requiresLeftArg, boolean requiresRightArg) {
+        Type(Category category, boolean requiresLeftArg, boolean requiresRightArg) {
             this.requiresLeftArg = requiresLeftArg;
             this.requiresRightArg = requiresRightArg;
+            this.category = category;
         }
 
-        private static GraphCharacterType fromString(String opChar, ParseMode parseMode) {
+        private static Type fromString(String opChar, ParseMode parseMode) {
             for(var op : values()) {
                 if(op.getPattern(parseMode).matcher(opChar).matches()) {
                     return op;
@@ -283,6 +287,11 @@ public class GraphCharacter {
         abstract Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode);
 
         abstract Pattern getPattern(ParseMode parseMode);
+    }
+
+    public enum Category {
+        OPERATOR,
+        BRACKET,
     }
 }
 
