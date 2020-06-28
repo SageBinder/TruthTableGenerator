@@ -129,7 +129,7 @@ public class GraphCharacter {
             }
         },
 
-        // The variable values won't affect binding order, because they don't bind to anything.
+        // The variable values won't affect binding order, because they don't bind to anything (they have no args).
         // However, QUANTIFIED_VARIABLE must come before VARIABLE, because a quantified variable will match both regexes.
         QUANTIFIED_VARIABLE(Category.OPERATOR, false, false) {
             @Override
@@ -157,7 +157,31 @@ public class GraphCharacter {
 
             @Override
             public Pattern getPattern(ParseMode parseMode) {
-                return Pattern.compile("[a-zA-Z1-9]+");
+                return Pattern.compile("[a-zA-Z]+[0-9]*");
+            }
+        },
+
+        TAUTOLOGY(Category.OPERATOR, false, false) {
+            @Override
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
+                return new com.sage.nodes.TAUTOLOGY(tag);
+            }
+
+            @Override
+            Pattern getPattern(ParseMode parseMode) {
+                return Pattern.compile("[1⊤]");
+            }
+        },
+
+        CONTRADICTION(Category.OPERATOR, false, false) {
+            @Override
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
+                return new com.sage.nodes.CONTRADICTION(tag);
+            }
+
+            @Override
+            Pattern getPattern(ParseMode parseMode) {
+                return Pattern.compile("[0⊥]");
             }
         },
 
