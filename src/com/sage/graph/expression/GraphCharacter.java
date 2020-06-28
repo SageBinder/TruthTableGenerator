@@ -184,6 +184,18 @@ public class GraphCharacter {
             }
         },
 
+        NAND() {
+            @Override
+            Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
+                return new com.sage.nodes.NAND(tag, left, right);
+            }
+
+            @Override
+            Pattern getPattern(ParseMode parseMode) {
+                return Pattern.compile("[.]");
+            }
+        },
+
         OR() {
             @Override
             Node makeNode(String tag, String character, Node left, Node right, ParseMode parseMode) {
