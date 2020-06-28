@@ -112,7 +112,7 @@ public class GraphCharacter {
 
             @Override
             public Pattern getPattern(ParseMode parseMode) {
-                return parseMode == ParseMode.PL ? Pattern.compile("\\(E[w-z]\\)") : MATCH_NOTHING;
+                return parseMode == ParseMode.PL ? Pattern.compile("\\([E∃][w-z]\\)") : MATCH_NOTHING;
             }
         },
 
@@ -125,7 +125,7 @@ public class GraphCharacter {
 
             @Override
             public Pattern getPattern(ParseMode parseMode) {
-                return parseMode == ParseMode.PL ? Pattern.compile("\\([w-z]\\)") : MATCH_NOTHING;
+                return parseMode == ParseMode.PL ? Pattern.compile("\\([∀]?[w-z]\\)") : MATCH_NOTHING;
             }
         },
 
@@ -169,7 +169,7 @@ public class GraphCharacter {
 
             @Override
             public Pattern getPattern(ParseMode parseMode) {
-                return Pattern.compile("[~!]");
+                return Pattern.compile("[~˜!¬]");
             }
         },
 
@@ -181,7 +181,7 @@ public class GraphCharacter {
 
             @Override
             public Pattern getPattern(ParseMode parseMode) {
-                return Pattern.compile("[&]{1,2}");
+                return Pattern.compile("[&∧]{1,2}");
             }
         },
 
@@ -205,7 +205,7 @@ public class GraphCharacter {
 
             @Override
             public Pattern getPattern(ParseMode parseMode) {
-                return Pattern.compile("\\+|[|]{1,2}");
+                return Pattern.compile("[+∨∥]|[|]{1,2}");
             }
         },
 
@@ -217,7 +217,7 @@ public class GraphCharacter {
 
             @Override
             public Pattern getPattern(ParseMode parseMode) {
-                return Pattern.compile("[>]");
+                return Pattern.compile("[>⇒→⊃]");
             }
         },
 
@@ -229,7 +229,7 @@ public class GraphCharacter {
 
             @Override
             public Pattern getPattern(ParseMode parseMode) {
-                return Pattern.compile("[=]{1,2}");
+                return Pattern.compile("[⇔≡↔]|[=]{1,2}]");
             }
         },
 
