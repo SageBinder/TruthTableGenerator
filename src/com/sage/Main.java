@@ -5,37 +5,18 @@ import com.sage.graph.GraphInputs;
 import com.sage.graph.expression.ParseMode;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Main {
-
     public static void main(String[] args) {
-        String expression = "(Ex)(Ey)Axy"; // There exists an x with property A
-        Graph graph = new Graph(expression, ParseMode.PL);
+        if(args.length == 0) {
+            System.err.print("Error: no expression provided");
+            return;
+        }
 
-        var UD = new GraphInputs.UniverseOfDiscourse();
-        UD.add("a", "b", "c");
-
-        var sentenceMap = new GraphInputs.SentenceMap();
-
-        var truthSet = new HashSet<GraphInputs.SentenceMap.TruthEntry>();
-        truthSet.add(new GraphInputs.SentenceMap.TruthEntry("a", "b"));
-
-        sentenceMap.put("A", truthSet);
-
-        var inputs = new GraphInputs().setSentenceMap(sentenceMap).setUD(UD);
-
-        System.out.println(inputs.toString() + "\n");
-
-        System.out.println("Raw expression: " + expression);
-        System.out.println("Parsed expression: " + graph.getParsedExpression());
-        System.out.println("Parsed expression with spaces: " + graph.getParsedExpression(" ") + "\n");
-
-        System.out.println(graph.evaluate(inputs));
-
-//        System.out.println(generateTruthTable(graph));
+        var expression = args[0];
+        System.out.println(generateTruthTable(new Graph(expression, ParseMode.BOOLEAN)));
     }
 
     public static String generateTruthTable(Graph graph) {
