@@ -1,6 +1,10 @@
 package com.sage.token.type.base;
 
-import com.sage.token.*;
+import com.sage.token.tokens.Token;
+import com.sage.token.parsing.ParseMode;
+import com.sage.token.parsing.TokenArgIndices;
+import com.sage.token.parsing.TokenArgs;
+import com.sage.token.parsing.TokenList;
 
 import java.util.List;
 

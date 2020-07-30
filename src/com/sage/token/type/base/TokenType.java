@@ -1,6 +1,6 @@
 package com.sage.token.type.base;
 
-import com.sage.token.ParseMode;
+import com.sage.token.parsing.ParseMode;
 
 import java.util.regex.Pattern;
 

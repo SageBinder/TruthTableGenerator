@@ -1,6 +1,7 @@
-package com.sage.token;
+package com.sage.token.parsing;
 
 import com.sage.exceptions.InvalidInputException;
+import com.sage.token.tokens.Token;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -121,7 +122,7 @@ public class TokenList {
             // If there's no intersection, none of the chars are being doubly interpreted, so we can go ahead and
             // interpret the regex match
             if(rangeIntersection.size() == 0) {
-                string[matcher.start()] = Token.newToken(matcher.group(), parseMode);
+                string[matcher.start()] = Token.newTokenFromString(matcher.group(), parseMode);
 
                 // Add the matched range to the set of previously matched ranges
                 expIndicesAlreadyUsed.addAll(matchedRange);

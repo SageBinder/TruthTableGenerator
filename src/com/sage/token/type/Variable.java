@@ -3,15 +3,15 @@ package com.sage.token.type;
 import com.sage.nodes.variables.VARIABLE;
 import com.sage.nodes.base.Node;
 import com.sage.nodes.variables.QUANTIFIED_VARIABLE;
-import com.sage.token.ParseMode;
+import com.sage.token.parsing.ParseMode;
 import com.sage.token.type.base.NoArgsNodeTokenType;
 import com.sage.token.type.base.TokenType;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.sage.token.TokenUtils.MATCH_NOTHING;
-import static com.sage.token.TokenUtils.combinePatterns;
+import static com.sage.token.parsing.TokenUtils.MATCH_NOTHING;
+import static com.sage.token.parsing.TokenUtils.combinePatterns;
 
 public enum Variable implements NoArgsNodeTokenType {
     VARIABLE {

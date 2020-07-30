@@ -1,7 +1,7 @@
 package com.sage.graph;
 
-import com.sage.token.TokenList;
-import com.sage.token.ParseMode;
+import com.sage.token.parsing.TokenList;
+import com.sage.token.parsing.ParseMode;
 import com.sage.nodes.outputs.OUTPUT;
 import com.sage.nodes.variables.VARIABLE;
 import com.sage.nodes.base.Node;

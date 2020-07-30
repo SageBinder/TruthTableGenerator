@@ -3,13 +3,17 @@ package com.sage.token.type;
 import com.sage.nodes.quantifiers.EXISTENTIAL_QUANTIFIER;
 import com.sage.nodes.quantifiers.UNIVERSAL_QUANTIFIER;
 import com.sage.nodes.base.Node;
-import com.sage.token.*;
+import com.sage.token.tokens.Token;
 import com.sage.token.type.base.NodeTokenType;
+import com.sage.token.parsing.ParseMode;
+import com.sage.token.parsing.TokenArgIndices;
+import com.sage.token.parsing.TokenArgs;
+import com.sage.token.parsing.TokenList;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.sage.token.TokenUtils.MATCH_NOTHING;
+import static com.sage.token.parsing.TokenUtils.MATCH_NOTHING;
 
 public enum Quantifier implements NodeTokenType {
     UNIVERSAL_QUANTIFIER {

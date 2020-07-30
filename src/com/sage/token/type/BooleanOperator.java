@@ -2,8 +2,9 @@ package com.sage.token.type;
 
 import com.sage.nodes.base.Node;
 import com.sage.nodes.booleanoperators.*;
-import com.sage.token.*;
+import com.sage.token.tokens.Token;
 import com.sage.token.type.base.NodeTokenType;
+import com.sage.token.parsing.*;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -134,14 +135,26 @@ public enum BooleanOperator implements NodeTokenType {
             argTokenLists[0] = new TokenList(
                     tokenList.subList(leftArgIndices[0], leftArgIndices[1] + 1),
                     parseMode);
-            relativeLeftIdx = leftArgIndices[1] - leftArgIndices[0];
+
+            // We add 1 because both indices will be the same number if the argument is a single token.
+            // This is because the first idx represents the first token in the argument, and the second idx represents
+            // the second token in the argument. This, if the argument is only one token, both indexes will be the same.
+            // In this case, we want to return a relative idx of 1, because the operator token itself is represented by
+            // a relative idx of 0.
+            relativeLeftIdx = leftArgIndices[1] - leftArgIndices[0] + 1;
         }
         if(requiresRightArg) {
             int[] rightArgIndices = TokenUtils.getRightArgsIndices(tokenList, idx);
             argTokenLists[1] = new TokenList(
                     tokenList.subList(rightArgIndices[0], rightArgIndices[1] + 1),
                     parseMode);
-            relativeRightIdx = rightArgIndices[1] - rightArgIndices[0];
+
+            // We add 1 because both indices will be the same number if the argument is a single token.
+            // This is because the first idx represents the first token in the argument, and the second idx represents
+            // the second token in the argument. This, if the argument is only one token, both indexes will be the same.
+            // In this case, we want to return a relative idx of 1, because the operator token itself is represented by
+            // a relative idx of 0.
+            relativeRightIdx = rightArgIndices[1] - rightArgIndices[0] + 1;
         }
         
         return new TokenArgs(new TokenArgIndices(relativeLeftIdx, relativeRightIdx), argTokenLists);

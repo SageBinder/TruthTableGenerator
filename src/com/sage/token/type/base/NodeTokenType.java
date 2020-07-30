@@ -1,9 +1,9 @@
 package com.sage.token.type.base;
 
 import com.sage.nodes.base.Node;
-import com.sage.token.ParseMode;
-import com.sage.token.Token;
-import com.sage.token.TokenArgs;
+import com.sage.token.parsing.ParseMode;
+import com.sage.token.tokens.Token;
+import com.sage.token.parsing.TokenArgs;
 
 import java.util.List;
 

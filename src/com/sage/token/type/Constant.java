@@ -3,7 +3,7 @@ package com.sage.token.type;
 import com.sage.nodes.constants.TAUTOLOGY;
 import com.sage.nodes.constants.CONTRADICTION;
 import com.sage.nodes.base.Node;
-import com.sage.token.ParseMode;
+import com.sage.token.parsing.ParseMode;
 import com.sage.token.type.base.NoArgsNodeTokenType;
 
 import java.util.regex.Pattern;

@@ -1,8 +1,7 @@
-package com.sage.token;
+package com.sage.token.parsing;
 
 import com.sage.exceptions.InvalidInputException;
-import com.sage.token.type.BooleanOperator;
-import com.sage.token.type.base.NodeTokenType;
+import com.sage.token.tokens.Token;
 import com.sage.token.type.base.TokenType;
 
 import java.util.Arrays;
