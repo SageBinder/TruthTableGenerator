@@ -1,4 +1,4 @@
-package com.sage.nodes;
+package com.sage.nodes.booleanoperators;
 
 import com.sage.graph.GraphInputs;
 import com.sage.nodes.base.Node;

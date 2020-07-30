@@ -1,9 +1,9 @@
 package com.sage.graph;
 
-import com.sage.graph.expression.GraphString;
-import com.sage.graph.expression.ParseMode;
-import com.sage.nodes.OUTPUT;
-import com.sage.nodes.VARIABLE;
+import com.sage.token.TokenList;
+import com.sage.token.ParseMode;
+import com.sage.nodes.outputs.OUTPUT;
+import com.sage.nodes.variables.VARIABLE;
 import com.sage.nodes.base.Node;
 
 import java.util.Arrays;
@@ -14,14 +14,14 @@ public class Graph {
     public final String rawExp;
     public final String[] variables;
 
-    public final GraphString graphString;
+    public final TokenList tokenList;
 
     private final OUTPUT outputNode;
 
     public Graph(String rawExp, ParseMode parseMode) {
         this.rawExp = rawExp;
-        this.graphString = new GraphString(rawExp, parseMode);
-        this.outputNode = GraphBuilder.build(graphString);
+        this.tokenList = new TokenList(rawExp, parseMode);
+        this.outputNode = GraphBuilder.build(tokenList);
         this.variables = findUniqueVariables(outputNode).toArray(new String[0]);
         Arrays.sort(variables);
     }
@@ -35,7 +35,7 @@ public class Graph {
     }
 
     public String getParsedExpression(String delimiter) {
-        return String.join(delimiter, graphString.toStringArray());
+        return String.join(delimiter, tokenList.toStringArray());
     }
 
     public OUTPUT getOutputNode() {

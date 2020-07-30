@@ -1,4 +1,4 @@
-package com.sage.graph.expression;
+package com.sage.token;
 
 public enum ParseMode {
     BOOLEAN, // Standard boolean expressions

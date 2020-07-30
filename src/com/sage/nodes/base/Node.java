@@ -29,7 +29,7 @@ public abstract class Node {
         return _evaluate(parents, inputs);
     }
 
-    abstract boolean _evaluate(Node[] parents, GraphInputs inputs);
+    protected abstract boolean _evaluate(Node[] parents, GraphInputs inputs);
 
     @Override
     public String toString() {

@@ -1,4 +1,4 @@
-package com.sage.nodes;
+package com.sage.nodes.quantifiers;
 
 import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
