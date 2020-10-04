@@ -1,19 +1,19 @@
-package com.sage.nodes;
+package com.sage.nodes.constants;
 
 import com.sage.graph.GraphInputs;
 import com.sage.nodes.base.Node0;
 
-public class CONTRADICTION extends Node0 {
-    public CONTRADICTION() {
+public class TAUTOLOGY extends Node0 {
+    public TAUTOLOGY() {
         super();
     }
 
-    public CONTRADICTION(String tag) {
+    public TAUTOLOGY(String tag) {
         super(tag);
     }
 
     @Override
     protected boolean _evaluate(GraphInputs inputs) {
-        return false;
+        return true;
     }
 }

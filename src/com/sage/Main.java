@@ -2,7 +2,7 @@ package com.sage;
 
 import com.sage.graph.Graph;
 import com.sage.graph.GraphInputs;
-import com.sage.graph.expression.ParseMode;
+import com.sage.token.parsing.ParseMode;
 
 import java.util.Arrays;
 import java.util.List;

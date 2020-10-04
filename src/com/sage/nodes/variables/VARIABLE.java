@@ -1,4 +1,4 @@
-package com.sage.nodes;
+package com.sage.nodes.variables;
 
 import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
@@ -12,7 +12,7 @@ public class VARIABLE extends Node0 {
     }
 
     @Override
-    public boolean _evaluate(GraphInputs inputs) {
+    protected boolean _evaluate(GraphInputs inputs) {
         var variableMapOptional = inputs.getBooleanVariableMap();
 
         if(variableMapOptional.isPresent()) {

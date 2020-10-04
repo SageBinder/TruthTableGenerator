@@ -1,4 +1,4 @@
-package com.sage.nodes;
+package com.sage.nodes.variables;
 
 import com.sage.exceptions.InvalidInputException;
 import com.sage.graph.GraphInputs;
@@ -17,7 +17,7 @@ public class QUANTIFIED_VARIABLE extends Node0 {
     }
 
     @Override
-    public boolean _evaluate(GraphInputs inputs) {
+    protected boolean _evaluate(GraphInputs inputs) {
         var sentenceMap = inputs.getSentenceMap().orElseThrow(() ->
                 new InvalidInputException("Error: QUANTIFIED_VARIABLE node could not find a sentence variable map."));
 
